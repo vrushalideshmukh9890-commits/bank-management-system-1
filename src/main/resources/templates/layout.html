@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} ?: 'AuraBank - Modern Banking Management System'">AuraBank</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/fintech.css}">
+</head>
+<body>
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">₹</div>
+            <div>
+                <div class="brand-title">AuraBank</div>
+                <div style="font-size: 11px; color: #94a3b8;">Fintech Core</div>
+            </div>
+            <span class="brand-badge">PROD</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a th:href="@{/dashboard}" class="nav-link" th:classappend="${activePage == 'dashboard'} ? 'active'">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a th:href="@{/create-account}" class="nav-link" th:classappend="${activePage == 'create-account'} ? 'active'">
+                <span class="nav-icon">👤</span>
+                <span>Create Account</span>
+            </a>
+            <a th:href="@{/account-details}" class="nav-link" th:classappend="${activePage == 'account-details'} ? 'active'">
+                <span class="nav-icon">💳</span>
+                <span>Account Operations</span>
+            </a>
+            <a th:href="@{/passbook}" class="nav-link" th:classappend="${activePage == 'passbook'} ? 'active'">
+                <span class="nav-icon">📖</span>
+                <span>Digital Passbook</span>
+            </a>
+            <a th:href="@{/analytics}" class="nav-link" th:classappend="${activePage == 'analytics'} ? 'active'">
+                <span class="nav-icon">📈</span>
+                <span>Bresenham Analytics</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>Branch: Pune Core #042</span>
+            <span style="color: #10b981;">● Online</span>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+        <!-- Top Navigation -->
+        <header class="topbar">
+            <div class="topbar-title">
+                <span th:text="${headerTitle} ?: 'Banking Management System'">Dashboard</span>
+            </div>
+            <div class="topbar-actions">
+                <form th:action="@{/account-details}" method="get" class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" name="accountNumber" placeholder="Search Account No..." required>
+                </form>
+                <div class="admin-badge">
+                    <div class="admin-avatar">CD</div>
+                    <span>Officer Portal</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Flash alerts -->
+        <div class="page-container" style="padding-bottom: 0;" th:if="${successMessage != null or errorMessage != null}">
+            <div class="alert-banner alert-success" th:if="${successMessage}">
+                <span>✓</span>
+                <span th:text="${successMessage}"></span>
+            </div>
+            <div class="alert-banner alert-danger" th:if="${errorMessage}">
+                <span>⚠️</span>
+                <span th:text="${errorMessage}"></span>
+            </div>
+        </div>
+
+        <!-- Page Specific Body inserted here -->
+        <main class="page-container" th:insert="${content}"></main>
+    </div>
+</div>
+
+<script th:src="@{/js/bresenham.js}"></script>
+</body>
+</html>

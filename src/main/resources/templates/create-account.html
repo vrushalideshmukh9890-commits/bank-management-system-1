@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open New Account - AuraBank</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/fintech.css}">
+</head>
+<body>
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">₹</div>
+            <div>
+                <div class="brand-title">AuraBank</div>
+                <div style="font-size: 11px; color: #94a3b8;">Fintech Core</div>
+            </div>
+            <span class="brand-badge">LIVE</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a th:href="@{/dashboard}" class="nav-link">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a th:href="@{/create-account}" class="nav-link active">
+                <span class="nav-icon">👤</span>
+                <span>Create Account</span>
+            </a>
+            <a th:href="@{/account-details}" class="nav-link">
+                <span class="nav-icon">💳</span>
+                <span>Account Operations</span>
+            </a>
+            <a th:href="@{/passbook}" class="nav-link">
+                <span class="nav-icon">📖</span>
+                <span>Digital Passbook</span>
+            </a>
+            <a th:href="@{/analytics}" class="nav-link">
+                <span class="nav-icon">📈</span>
+                <span>Bresenham Analytics</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>Branch: Pune Core #042</span>
+            <span style="color: #10b981;">● Online</span>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-title">
+                <span>Account Onboarding</span>
+            </div>
+            <div class="topbar-actions">
+                <form th:action="@{/account-details}" method="get" class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" name="accountNumber" placeholder="Search Account No..." required>
+                </form>
+                <div class="admin-badge">
+                    <div class="admin-avatar">CD</div>
+                    <span>Officer Portal</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-container">
+            <div style="max-width: 680px; margin: 0 auto;">
+                <!-- Error Alert if any -->
+                <div class="alert-banner alert-danger" th:if="${errorMessage}">
+                    <span>⚠️</span>
+                    <span th:text="${errorMessage}"></span>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">📝 Open a New Customer Account</div>
+                            <div class="card-subtitle">Generate an instant 12-digit account number and credit the opening deposit.</div>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/create-account}" method="post" id="createAccountForm">
+                        <div class="form-group">
+                            <label class="form-label" for="holderName">Account Holder Full Name *</label>
+                            <input type="text" 
+                                   id="holderName" 
+                                   name="holderName" 
+                                   class="form-control" 
+                                   placeholder="e.g. Chaitanya Deshmukh" 
+                                   th:value="${holderName}" 
+                                   required 
+                                   minlength="3" 
+                                   maxlength="100">
+                            <div class="form-hint">Must match official identification documents.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="mobileNumber">Registered Mobile Number *</label>
+                            <input type="tel" 
+                                   id="mobileNumber" 
+                                   name="mobileNumber" 
+                                   class="form-control" 
+                                   placeholder="10-digit number e.g. 9823456789" 
+                                   pattern="^[6-9]\d{9}$" 
+                                   title="Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9" 
+                                   th:value="${mobileNumber}" 
+                                   required>
+                            <div class="form-hint">Used for 2FA OTP and transaction SMS alerts.</div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="accountType">Account Scheme</label>
+                                <select id="accountType" name="accountType" class="form-control">
+                                    <option value="Savings Account">Regular Savings Account (4.0% p.a.)</option>
+                                    <option value="Current Account">Premium Current Account</option>
+                                    <option value="Salary Account">Corporate Salary Account</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="openingDeposit">Opening Deposit (₹) *</label>
+                                <input type="number" 
+                                       id="openingDeposit" 
+                                       name="openingDeposit" 
+                                       class="form-control" 
+                                       placeholder="Minimum ₹500" 
+                                       min="500" 
+                                       step="100" 
+                                       th:value="${openingDeposit ?: 5000}" 
+                                       required>
+                                <div class="form-hint">Minimum required opening balance is ₹500.00.</div>
+                            </div>
+                        </div>
+
+                        <div style="background-color: var(--color-primary-subtle); border: 1px solid var(--color-primary-border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 24px;">
+                            <div style="font-size: 13px; font-weight: 600; color: var(--color-primary); margin-bottom: 4px;">🛡️ Regulatory & Bank Policy Notice</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">
+                                Opening an account commits immediate debit ledger entries in the persistent database. Daily withdrawal limit for this account will be standardized to <strong>₹20,000.00 / day</strong>.
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                            <a th:href="@{/dashboard}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary" id="btn-submit-account" style="padding: 10px 24px;">
+                                <span>✓</span> Create Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

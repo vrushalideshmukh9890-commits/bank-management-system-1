@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Operations - AuraBank</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/fintech.css}">
+</head>
+<body>
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">₹</div>
+            <div>
+                <div class="brand-title">AuraBank</div>
+                <div style="font-size: 11px; color: #94a3b8;">Fintech Core</div>
+            </div>
+            <span class="brand-badge">LIVE</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a th:href="@{/dashboard}" class="nav-link"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+            <a th:href="@{/create-account}" class="nav-link"><span class="nav-icon">👤</span><span>Create Account</span></a>
+            <a th:href="@{/account-details}" class="nav-link active"><span class="nav-icon">💳</span><span>Account Operations</span></a>
+            <a th:href="@{/passbook}" class="nav-link"><span class="nav-icon">📖</span><span>Digital Passbook</span></a>
+            <a th:href="@{/analytics}" class="nav-link"><span class="nav-icon">📈</span><span>Bresenham Analytics</span></a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>Branch: Pune Core #042</span>
+            <span style="color: #10b981;">● Online</span>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-title"><span>Account Operations & Details</span></div>
+            <div class="topbar-actions">
+                <form th:action="@{/account-details}" method="get" class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" name="accountNumber" placeholder="Search Account No..." th:value="${account?.accountNumber}">
+                </form>
+                <div class="admin-badge">
+                    <div class="admin-avatar">CD</div>
+                    <span>Officer Portal</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-container">
+            <!-- Alert Banners -->
+            <div class="alert-banner alert-success" th:if="${successMessage}">
+                <span>✓</span>
+                <span th:text="${successMessage}"></span>
+            </div>
+            <div class="alert-banner alert-danger" th:if="${errorMessage}">
+                <span>⚠️</span>
+                <span th:text="${errorMessage}"></span>
+            </div>
+
+            <!-- Account Selector Card -->
+            <div class="card" style="margin-bottom: 24px;">
+                <form th:action="@{/account-details}" method="get" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <label class="form-label" for="selectAccount">Select or Search Existing Account</label>
+                        <select id="selectAccount" name="accountNumber" class="form-control" onchange="this.form.submit()">
+                            <option value="">-- Choose Account Holder --</option>
+                            <option th:each="acc : ${allAccounts}" 
+                                    th:value="${acc.accountNumber}" 
+                                    th:text="${acc.holderName + ' (' + acc.accountNumber + ') - Balance: ₹' + #numbers.formatDecimal(acc.balance, 1, 'COMMA', 2, 'POINT')}"
+                                    th:selected="${account != null and acc.accountNumber == account.accountNumber}">
+                            </option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="height: 42px;">Fetch Details</button>
+                    <a th:href="@{/create-account}" class="btn btn-secondary" style="height: 42px;">＋ New Account</a>
+                </form>
+            </div>
+
+            <!-- When NO Account is Selected -->
+            <div class="empty-state card" th:if="${account == null and errorMessage == null}">
+                <div class="empty-state-icon">💳</div>
+                <div class="empty-state-title">Select an Account to View Details</div>
+                <div class="empty-state-text">Choose an account from the dropdown above or enter an account number to perform deposits and withdrawals.</div>
+            </div>
+
+            <!-- When Account is Selected: Details + Deposit/Withdraw Forms + Transaction History -->
+            <div th:if="${account != null}">
+                <!-- Account Profile Card -->
+                <div class="card" style="margin-bottom: 24px; background: linear-gradient(135deg, #ffffff, #f0fdfa); border-left: 5px solid var(--color-primary);">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Account Holder</div>
+                            <div style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin-top: 2px;" th:text="${account.holderName}">Aarav Sharma</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Mobile: <span th:text="${account.mobileNumber}">9823456789</span></div>
+                        </div>
+
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Account Number</div>
+                            <div style="font-family: monospace; font-size: 18px; font-weight: 700; color: var(--color-primary); margin-top: 2px;" th:text="${account.accountNumber}">602310842911</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Type: <span th:text="${account.accountType}">Savings Account</span></div>
+                        </div>
+
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Current Available Balance</div>
+                            <div style="font-size: 24px; font-weight: 800; color: var(--color-emerald); margin-top: 2px;">
+                                ₹<span th:text="${#numbers.formatDecimal(account.balance, 1, 'COMMA', 2, 'POINT')}">45,000.00</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Created: <span th:text="${#temporals.format(account.createdAt, 'dd-MMM-yyyy')}">05-Oct-2026</span></div>
+                        </div>
+
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Daily Limit (₹20,000 / Day)</div>
+                            <div style="font-size: 15px; font-weight: 700; color: var(--color-gold); margin-top: 2px;">
+                                Remaining: ₹<span th:text="${#numbers.formatDecimal(remainingLimit, 1, 'COMMA', 2, 'POINT')}">20,000.00</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Withdrawn today: ₹<span th:text="${#numbers.formatDecimal(todayWithdrawn, 1, 'COMMA', 2, 'POINT')}">0.00</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two-Column Actions: Deposit Money & Withdraw Money -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 28px;">
+                    <!-- Deposit Form -->
+                    <div class="card" style="border-top: 4px solid var(--color-emerald);">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title" style="color: var(--color-emerald);">⬇ Deposit Funds</div>
+                                <div class="card-subtitle">Instant credit to available balance</div>
+                            </div>
+                        </div>
+                        <form th:action="@{/deposit}" method="post">
+                            <input type="hidden" name="accountNumber" th:value="${account.accountNumber}">
+                            <div class="form-group">
+                                <label class="form-label" for="depositAmount">Deposit Amount (₹) *</label>
+                                <input type="number" id="depositAmount" name="amount" class="form-control" placeholder="Enter amount, e.g. 5000" min="1" step="10" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="depositDesc">Narration / Description</label>
+                                <input type="text" id="depositDesc" name="description" class="form-control" placeholder="e.g. Cash deposit, Salary, Dividend">
+                            </div>
+                            <button type="submit" class="btn btn-success" style="width: 100%;">
+                                Confirm Deposit
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Withdrawal Form with Balance & Daily Limit Safeguards -->
+                    <div class="card" style="border-top: 4px solid var(--color-gold);">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title" style="color: var(--color-gold);">⬆ Withdraw Funds</div>
+                                <div class="card-subtitle">Strict balance & ₹20,000 daily limit validation</div>
+                            </div>
+                        </div>
+                        <form th:action="@{/withdraw}" method="post" id="withdrawForm" onsubmit="return validateWithdrawal();">
+                            <input type="hidden" name="accountNumber" th:value="${account.accountNumber}">
+                            <div class="form-group">
+                                <label class="form-label" for="withdrawAmount">Withdrawal Amount (₹) *</label>
+                                <input type="number" id="withdrawAmount" name="amount" class="form-control" placeholder="Enter amount, e.g. 2000" min="1" step="10" required>
+                                <div id="withdrawFeedback" style="font-size: 12px; margin-top: 4px; display: none;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="withdrawDesc">Narration / Description</label>
+                                <input type="text" id="withdrawDesc" name="description" class="form-control" placeholder="e.g. ATM Cash, Bill Payment">
+                            </div>
+                            <button type="submit" class="btn btn-warning" style="width: 100%;">
+                                Confirm Withdrawal
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Account Specific Transaction History -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">📜 Account Transaction History</div>
+                            <div class="card-subtitle">All debits and credits linked with this account</div>
+                        </div>
+                        <a th:href="@{/passbook(accountNumber=${account.accountNumber})}" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">
+                            View in Digital Passbook &rarr;
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Balance After</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${#lists.isEmpty(transactions)}">
+                                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                                        No transactions recorded for this account.
+                                    </td>
+                                </tr>
+                                <tr th:each="txn : ${transactions}">
+                                    <td><code style="color: var(--color-primary); font-weight: 600;" th:text="${txn.transactionId}">TXN123</code></td>
+                                    <td th:text="${#temporals.format(txn.transactionDate, 'dd-MMM-yyyy HH:mm')}">20-Oct-2026</td>
+                                    <td>
+                                        <span class="badge" th:classappend="${txn.type == 'DEPOSIT'} ? 'badge-deposit' : 'badge-withdrawal'" th:text="${txn.type}">DEPOSIT</span>
+                                    </td>
+                                    <td th:text="${txn.description}">Deposit</td>
+                                    <td>
+                                        <span th:class="${txn.type == 'DEPOSIT'} ? 'amount-credit' : 'amount-debit'">
+                                            <span th:text="${txn.type == 'DEPOSIT'} ? '+₹' : '-₹'">+₹</span><span th:text="${#numbers.formatDecimal(txn.amount, 1, 'COMMA', 2, 'POINT')}">1,000.00</span>
+                                        </span>
+                                    </td>
+                                    <td style="font-weight: 600;">₹<span th:text="${#numbers.formatDecimal(txn.balanceAfter, 1, 'COMMA', 2, 'POINT')}">46,000.00</span></td>
+                                    <td><span class="badge badge-success">SUCCESS</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const currentBalance = /*[[${account != null ? account.balance : 0}]]*/ 0;
+    const remainingDailyLimit = /*[[${remainingLimit != null ? remainingLimit : 20000}]]*/ 20000;
+
+    const withdrawInput = document.getElementById('withdrawAmount');
+    const feedback = document.getElementById('withdrawFeedback');
+
+    if (withdrawInput) {
+        withdrawInput.addEventListener('input', () => {
+            const val = parseFloat(withdrawInput.value) || 0;
+            if (val > currentBalance) {
+                feedback.style.display = 'block';
+                feedback.style.color = '#dc2626';
+                feedback.textContent = `⚠️ Warning: Amount exceeds available balance (₹${currentBalance.toLocaleString('en-IN')})!`;
+            } else if (val > remainingDailyLimit) {
+                feedback.style.display = 'block';
+                feedback.style.color = '#d97706';
+                feedback.textContent = `⚠️ Warning: Amount exceeds remaining daily limit (₹${remainingDailyLimit.toLocaleString('en-IN')})! Max allowed today: ₹${remainingDailyLimit.toLocaleString('en-IN')}`;
+            } else {
+                feedback.style.display = 'none';
+            }
+        });
+    }
+
+    function validateWithdrawal() {
+        const val = parseFloat(withdrawInput.value) || 0;
+        if (val <= 0) {
+            alert("Please enter a valid withdrawal amount.");
+            return false;
+        }
+        if (val > currentBalance) {
+            alert(`Withdrawal rejected: Insufficient funds! Current balance is ₹${currentBalance.toLocaleString('en-IN')}.`);
+            return false;
+        }
+        if (val > remainingDailyLimit) {
+            alert(`Withdrawal rejected: Daily limit of ₹20,000 exceeded! Remaining limit today is ₹${remainingDailyLimit.toLocaleString('en-IN')}.`);
+            return false;
+        }
+        return confirm(`Please confirm withdrawal of ₹${val.toLocaleString('en-IN')}?`);
+    }
+</script>
+</body>
+</html>

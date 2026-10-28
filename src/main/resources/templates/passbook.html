@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Passbook - AuraBank</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/fintech.css}">
+</head>
+<body>
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">₹</div>
+            <div>
+                <div class="brand-title">AuraBank</div>
+                <div style="font-size: 11px; color: #94a3b8;">Fintech Core</div>
+            </div>
+            <span class="brand-badge">LIVE</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a th:href="@{/dashboard}" class="nav-link"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+            <a th:href="@{/create-account}" class="nav-link"><span class="nav-icon">👤</span><span>Create Account</span></a>
+            <a th:href="@{/account-details}" class="nav-link"><span class="nav-icon">💳</span><span>Account Operations</span></a>
+            <a th:href="@{/passbook}" class="nav-link active"><span class="nav-icon">📖</span><span>Digital Passbook</span></a>
+            <a th:href="@{/analytics}" class="nav-link"><span class="nav-icon">📈</span><span>Bresenham Analytics</span></a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>Branch: Pune Core #042</span>
+            <span style="color: #10b981;">● Online</span>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-title"><span>Official Digital Passbook</span></div>
+            <div class="topbar-actions">
+                <button type="button" class="btn btn-secondary" onclick="window.print()" th:if="${account != null}">
+                    <span>🖨️</span> Print / Save PDF
+                </button>
+            </div>
+        </header>
+
+        <main class="page-container">
+            <!-- Filter Form Card -->
+            <div class="card no-print" style="margin-bottom: 24px;">
+                <form th:action="@{/passbook}" method="get" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto; gap: 16px; align-items: flex-end;">
+                    <div>
+                        <label class="form-label" for="passbookAccount">Select Account *</label>
+                        <select id="passbookAccount" name="accountNumber" class="form-control" required>
+                            <option value="">-- Choose Account --</option>
+                            <option th:each="acc : ${allAccounts}" 
+                                    th:value="${acc.accountNumber}" 
+                                    th:text="${acc.holderName + ' (' + acc.accountNumber + ')'}"
+                                    th:selected="${account != null and acc.accountNumber == account.accountNumber}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="fromDate">From Date</label>
+                        <input type="date" id="fromDate" name="fromDate" class="form-control" th:value="${fromDate}">
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="toDate">To Date</label>
+                        <input type="date" id="toDate" name="toDate" class="form-control" th:value="${toDate}">
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-primary" style="height: 42px; width: 100%;">
+                            <span>🔍</span> Generate Statement
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Print Header Banner (Shown ONLY during browser print) -->
+            <div class="print-only-header">
+                <h1 style="font-size: 24px; color: #0f766e; margin-bottom: 4px;">AuraBank Ltd. - Digital Passbook</h1>
+                <p style="font-size: 12px; color: #64748b;">Core Banking Branch #042 | Pune, Maharashtra | IFSC: AURA0004291</p>
+                <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Computer-generated official statement. No signature required.</div>
+            </div>
+
+            <!-- Empty State when nothing searched -->
+            <div class="empty-state card" th:if="${account == null and errorMessage == null}">
+                <div class="empty-state-icon">📖</div>
+                <div class="empty-state-title">Select an Account to View Passbook</div>
+                <div class="empty-state-text">Choose an account above to generate a verified debit/credit statement with opening and closing balances.</div>
+            </div>
+
+            <!-- Error Banner -->
+            <div class="alert-banner alert-danger" th:if="${errorMessage}">
+                <span>⚠️</span>
+                <span th:text="${errorMessage}"></span>
+            </div>
+
+            <!-- Statement Content -->
+            <div class="card" th:if="${account != null}">
+                <!-- Account Meta Summary -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--border-color); padding-bottom: 18px; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary);" th:text="${account.holderName}">Aarav Sharma</h2>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">
+                            Account No: <strong style="color: var(--color-primary); font-family: monospace;" th:text="${account.accountNumber}">602310842911</strong>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            Scheme: <span th:text="${account.accountType}">Savings Account</span> | Mobile: <span th:text="${account.mobileNumber}">9823456789</span>
+                        </div>
+                    </div>
+
+                    <div style="text-align: right;">
+                        <div style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Net Available Balance</div>
+                        <div style="font-size: 26px; font-weight: 800; color: var(--color-emerald);">
+                            ₹<span th:text="${#numbers.formatDecimal(account.balance, 1, 'COMMA', 2, 'POINT')}">45,000.00</span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                            Period: <span th:text="${fromDate}"></span> to <span th:text="${toDate}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty state if no transactions in range -->
+                <div class="empty-state" th:if="${#lists.isEmpty(transactions)}">
+                    <div class="empty-state-icon">🔍</div>
+                    <div class="empty-state-title">No Transactions In Selected Date Range</div>
+                    <div class="empty-state-text">No deposits or withdrawals were recorded for this period. Try extending the date filter.</div>
+                </div>
+
+                <!-- Passbook Ledger Table -->
+                <div class="table-responsive" th:if="${!#lists.isEmpty(transactions)}">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Txn Date</th>
+                                <th>Transaction Ref</th>
+                                <th>Narration / Particulars</th>
+                                <th style="text-align: right;">Debit (Withdrawal ₹)</th>
+                                <th style="text-align: right;">Credit (Deposit ₹)</th>
+                                <th style="text-align: right;">Running Balance (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="t : ${transactions}">
+                                <td th:text="${#temporals.format(t.transactionDate, 'dd-MMM-yyyy HH:mm')}">20-Oct-2026</td>
+                                <td><code style="color: var(--color-primary); font-size: 12px;" th:text="${t.transactionId}">TXN1001</code></td>
+                                <td th:text="${t.description}">Opening Deposit</td>
+                                <!-- Debit Column -->
+                                <td style="text-align: right;">
+                                    <span th:if="${t.type == 'WITHDRAWAL'}" class="amount-debit">
+                                        -₹<span th:text="${#numbers.formatDecimal(t.amount, 1, 'COMMA', 2, 'POINT')}">5,000.00</span>
+                                    </span>
+                                    <span th:unless="${t.type == 'WITHDRAWAL'}" style="color: var(--text-muted);">-</span>
+                                </td>
+                                <!-- Credit Column -->
+                                <td style="text-align: right;">
+                                    <span th:if="${t.type == 'DEPOSIT'}" class="amount-credit">
+                                        +₹<span th:text="${#numbers.formatDecimal(t.amount, 1, 'COMMA', 2, 'POINT')}">5,000.00</span>
+                                    </span>
+                                    <span th:unless="${t.type == 'DEPOSIT'}" style="color: var(--text-muted);">-</span>
+                                </td>
+                                <!-- Running Balance Column -->
+                                <td style="text-align: right; font-weight: 700; color: var(--text-primary);">
+                                    ₹<span th:text="${#numbers.formatDecimal(t.balanceAfter, 1, 'COMMA', 2, 'POINT')}">50,000.00</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer Sign-off in Print Layout -->
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
+                    <div>Statement generated on: <span th:text="${#temporals.format(#temporals.createNow(), 'dd-MMM-yyyy HH:mm:ss')}"></span></div>
+                    <div>Page 1 of 1</div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

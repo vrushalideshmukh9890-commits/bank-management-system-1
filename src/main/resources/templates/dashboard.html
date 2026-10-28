@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AuraBank</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/fintech.css}">
+</head>
+<body>
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">₹</div>
+            <div>
+                <div class="brand-title">AuraBank</div>
+                <div style="font-size: 11px; color: #94a3b8;">Fintech Core</div>
+            </div>
+            <span class="brand-badge">LIVE</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a th:href="@{/dashboard}" class="nav-link active">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a th:href="@{/create-account}" class="nav-link">
+                <span class="nav-icon">👤</span>
+                <span>Create Account</span>
+            </a>
+            <a th:href="@{/account-details}" class="nav-link">
+                <span class="nav-icon">💳</span>
+                <span>Account Operations</span>
+            </a>
+            <a th:href="@{/passbook}" class="nav-link">
+                <span class="nav-icon">📖</span>
+                <span>Digital Passbook</span>
+            </a>
+            <a th:href="@{/analytics}" class="nav-link">
+                <span class="nav-icon">📈</span>
+                <span>Bresenham Analytics</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>Branch: Pune Core #042</span>
+            <span style="color: #10b981;">● Online</span>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-title">
+                <span>Executive Dashboard</span>
+            </div>
+            <div class="topbar-actions">
+                <form th:action="@{/account-details}" method="get" class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" name="accountNumber" placeholder="Search Account No..." required>
+                </form>
+                <div class="admin-badge">
+                    <div class="admin-avatar">CD</div>
+                    <span>Officer Portal</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-container">
+            <!-- Flash Message Alerts -->
+            <div class="alert-banner alert-success" th:if="${successMessage}">
+                <span>✓</span>
+                <span th:text="${successMessage}"></span>
+            </div>
+            <div class="alert-banner alert-danger" th:if="${errorMessage}">
+                <span>⚠️</span>
+                <span th:text="${errorMessage}"></span>
+            </div>
+
+            <!-- Summary KPI Cards -->
+            <div class="stats-grid">
+                <div class="stat-card teal">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Accounts</div>
+                        <div class="stat-value" th:text="${stats.totalAccounts}">0</div>
+                    </div>
+                </div>
+
+                <div class="stat-card emerald">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Deposits</div>
+                        <div class="stat-value">₹<span th:text="${#numbers.formatDecimal(stats.totalDeposits, 1, 'COMMA', 2, 'POINT')}">0.00</span></div>
+                    </div>
+                </div>
+
+                <div class="stat-card gold">
+                    <div class="stat-icon">💸</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Withdrawals</div>
+                        <div class="stat-value">₹<span th:text="${#numbers.formatDecimal(stats.totalWithdrawals, 1, 'COMMA', 2, 'POINT')}">0.00</span></div>
+                    </div>
+                </div>
+
+                <div class="stat-card indigo">
+                    <div class="stat-icon">🏦</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Liquidity Pool</div>
+                        <div class="stat-value">₹<span th:text="${#numbers.formatDecimal(stats.totalBankBalance, 1, 'COMMA', 2, 'POINT')}">0.00</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prominent Quick Actions Section -->
+            <div class="quick-actions-bar">
+                <div class="quick-actions-title">⚡ Quick Banking Actions</div>
+                <div class="quick-actions-btns">
+                    <a th:href="@{/create-account}" class="btn btn-primary" id="btn-quick-create">
+                        <span>＋</span> Create Account
+                    </a>
+                    <a th:href="@{/account-details}" class="btn btn-success" id="btn-quick-deposit">
+                        <span>⬇</span> Deposit Money
+                    </a>
+                    <a th:href="@{/account-details}" class="btn btn-warning" id="btn-quick-withdraw">
+                        <span>⬆</span> Withdraw Money
+                    </a>
+                    <a th:href="@{/account-details}" class="btn btn-secondary" id="btn-quick-details">
+                        <span>🔍</span> Account Details
+                    </a>
+                    <a th:href="@{/passbook}" class="btn btn-secondary" id="btn-quick-passbook">
+                        <span>📖</span> Passbook Statement
+                    </a>
+                    <a th:href="@{/analytics}" class="btn btn-outline" id="btn-quick-analytics">
+                        <span>📈</span> Bresenham Charts
+                    </a>
+                </div>
+            </div>
+
+            <!-- Two Column Layout: Canvas Visualizer & Recent Transactions -->
+            <div style="display: grid; grid-template-columns: 1fr; gap: 28px;">
+                <!-- Real-time Bresenham Line Drawing Canvas -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">📈 Real-time Account Liquidity Chart</div>
+                            <div class="card-subtitle">Rendered pixel-by-pixel using Computer Graphics <strong>Bresenham's Line Algorithm</strong></div>
+                        </div>
+                        <a th:href="@{/analytics}" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">Full Analytics &rarr;</a>
+                    </div>
+                    <div class="canvas-wrapper">
+                        <canvas id="dashboardBresenhamCanvas" class="bresenham-canvas" width="900" height="260"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">🕒 Recent Transaction Ledger</div>
+                            <div class="card-subtitle">Real-time database ledger of latest banking operations</div>
+                        </div>
+                    </div>
+
+                    <!-- Empty state if no transactions -->
+                    <div class="empty-state" th:if="${#lists.isEmpty(recentTransactions)}">
+                        <div class="empty-state-icon">📂</div>
+                        <div class="empty-state-title">No Transactions Recorded Yet</div>
+                        <div class="empty-state-text">Create an account or make a deposit to see real-time ledger entries here.</div>
+                        <a th:href="@{/create-account}" class="btn btn-primary">Create First Account</a>
+                    </div>
+
+                    <!-- Data table if transactions exist -->
+                    <div class="table-responsive" th:if="${!#lists.isEmpty(recentTransactions)}">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction Ref</th>
+                                    <th>Date & Time</th>
+                                    <th>Account No</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Balance After</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="txn : ${recentTransactions}">
+                                    <td><code style="font-size: 12px; color: var(--color-primary); font-weight: 600;" th:text="${txn.transactionId}">TXN123</code></td>
+                                    <td th:text="${#temporals.format(txn.transactionDate, 'dd-MMM-yyyy HH:mm')}">20-Oct-2026</td>
+                                    <td>
+                                        <a th:href="@{/account-details(accountNumber=${txn.accountNumber})}" 
+                                           style="color: var(--color-primary); font-weight: 600; text-decoration: none;"
+                                           th:text="${txn.accountNumber}">6023...</a>
+                                    </td>
+                                    <td>
+                                        <span class="badge" th:classappend="${txn.type == 'DEPOSIT'} ? 'badge-deposit' : 'badge-withdrawal'" th:text="${txn.type}">DEPOSIT</span>
+                                    </td>
+                                    <td th:text="${txn.description}">Deposit</td>
+                                    <td>
+                                        <span th:class="${txn.type == 'DEPOSIT'} ? 'amount-credit' : 'amount-debit'">
+                                            <span th:text="${txn.type == 'DEPOSIT'} ? '+₹' : '-₹'">+₹</span><span th:text="${#numbers.formatDecimal(txn.amount, 1, 'COMMA', 2, 'POINT')}">10,000.00</span>
+                                        </span>
+                                    </td>
+                                    <td style="font-weight: 600;">₹<span th:text="${#numbers.formatDecimal(txn.balanceAfter, 1, 'COMMA', 2, 'POINT')}">50,000.00</span></td>
+                                    <td>
+                                        <span class="badge badge-success">SUCCESS</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script th:src="@{/js/bresenham.js}"></script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", () => {
+        const canvas = document.getElementById('dashboardBresenhamCanvas');
+        if (!canvas) return;
+
+        // Extract account balance data from real model
+        /*[# th:if="${!#lists.isEmpty(accounts)}"]*/
+        const accountsData = [
+            /*[# th:each="acc : ${accounts}"]*/
+            {
+                label: /*[[${acc.holderName}]]*/ 'Account',
+                value: /*[[${acc.balance}]]*/ 0
+            },
+            /*[/]*/
+        ];
+        /*[/]*/
+
+        /*[# th:if="${#lists.isEmpty(accounts)}"]*/
+        const accountsData = [
+            { label: 'Demo A', value: 20000 },
+            { label: 'Demo B', value: 45000 },
+            { label: 'Demo C', value: 35000 }
+        ];
+        /*[/]*/
+
+        const renderer = new BresenhamCanvasRenderer(canvas);
+        renderer.renderLineChart(accountsData, {
+            title: 'Account Holdings Distribution (Bresenham Algorithm)',
+            lineColor: '#0f766e',
+            pointColor: '#d97706'
+        });
+    });
+</script>
+</body>
+</html>

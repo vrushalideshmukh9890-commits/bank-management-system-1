@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Created Successfully - AuraBank</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/fintech.css}">
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">₹</div>
+            <div>
+                <div class="brand-title">AuraBank</div>
+                <div style="font-size: 11px; color: #94a3b8;">Fintech Core</div>
+            </div>
+            <span class="brand-badge">LIVE</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a th:href="@{/dashboard}" class="nav-link"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+            <a th:href="@{/create-account}" class="nav-link active"><span class="nav-icon">👤</span><span>Create Account</span></a>
+            <a th:href="@{/account-details}" class="nav-link"><span class="nav-icon">💳</span><span>Account Operations</span></a>
+            <a th:href="@{/passbook}" class="nav-link"><span class="nav-icon">📖</span><span>Digital Passbook</span></a>
+            <a th:href="@{/analytics}" class="nav-link"><span class="nav-icon">📈</span><span>Bresenham Analytics</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <span>Branch: Pune Core #042</span>
+            <span style="color: #10b981;">● Online</span>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-title"><span>Account Confirmation</span></div>
+        </header>
+
+        <main class="page-container">
+            <div style="max-width: 600px; margin: 40px auto; text-align: center;">
+                <div class="card" style="padding: 40px;">
+                    <div style="width: 72px; height: 72px; background: var(--status-success-bg); color: var(--color-emerald); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 20px;">
+                        ✓
+                    </div>
+
+                    <h2 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
+                        Account Activated Successfully!
+                    </h2>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;">
+                        The new customer account has been created in the persistent database with opening balance verified.
+                    </p>
+
+                    <!-- Account Details Highlight Box -->
+                    <div style="background-color: var(--bg-subtle); border: 2px dashed var(--color-primary-border); border-radius: var(--radius-md); padding: 24px; margin-bottom: 28px; text-align: left;" th:if="${createdAccount}">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                            <span style="font-size: 13px; color: var(--text-secondary);">Account Holder:</span>
+                            <strong style="font-size: 14px; color: var(--text-primary);" th:text="${createdAccount.holderName}">Chaitanya Deshmukh</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                            <span style="font-size: 13px; color: var(--text-secondary);">Account Number:</span>
+                            <span style="font-family: monospace; font-size: 18px; font-weight: 700; color: var(--color-primary); letter-spacing: 0.05em;" th:text="${createdAccount.accountNumber}">602384910293</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                            <span style="font-size: 13px; color: var(--text-secondary);">Initial Balance:</span>
+                            <strong style="font-size: 15px; color: var(--color-emerald);">₹<span th:text="${#numbers.formatDecimal(createdAccount.balance, 1, 'COMMA', 2, 'POINT')}">5,000.00</span></strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="font-size: 13px; color: var(--text-secondary);">Daily Withdrawal Limit:</span>
+                            <strong style="font-size: 13px; color: var(--color-gold);">₹20,000.00 / day</strong>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; justify-content: center;">
+                        <a th:href="@{/dashboard}" class="btn btn-secondary">Go to Dashboard</a>
+                        <a th:if="${createdAccount}" th:href="@{/account-details(accountNumber=${createdAccount.accountNumber})}" class="btn btn-primary">
+                            Manage Account &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

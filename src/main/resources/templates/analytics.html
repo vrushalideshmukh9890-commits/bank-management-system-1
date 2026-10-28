@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & Computer Graphics - AuraBank</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/fintech.css}">
+    <!-- Chart.js for comparative Bar/Pie charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">₹</div>
+            <div>
+                <div class="brand-title">AuraBank</div>
+                <div style="font-size: 11px; color: #94a3b8;">Fintech Core</div>
+            </div>
+            <span class="brand-badge">LIVE</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a th:href="@{/dashboard}" class="nav-link"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+            <a th:href="@{/create-account}" class="nav-link"><span class="nav-icon">👤</span><span>Create Account</span></a>
+            <a th:href="@{/account-details}" class="nav-link"><span class="nav-icon">💳</span><span>Account Operations</span></a>
+            <a th:href="@{/passbook}" class="nav-link"><span class="nav-icon">📖</span><span>Digital Passbook</span></a>
+            <a th:href="@{/analytics}" class="nav-link active"><span class="nav-icon">📈</span><span>Bresenham Analytics</span></a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span>Branch: Pune Core #042</span>
+            <span style="color: #10b981;">● Online</span>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-title"><span>Analytics & Computer Graphics Engine</span></div>
+            <div class="topbar-actions">
+                <div class="admin-badge">
+                    <div class="admin-avatar">CG</div>
+                    <span>Algorithm Viva Mode</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-container">
+            <!-- Key Stats Header -->
+            <div class="stats-grid">
+                <div class="stat-card teal">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Deposits Inflow</div>
+                        <div class="stat-value">₹<span th:text="${#numbers.formatDecimal(stats.totalDeposits, 1, 'COMMA', 2, 'POINT')}">0.00</span></div>
+                    </div>
+                </div>
+
+                <div class="stat-card gold">
+                    <div class="stat-icon">📉</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Total Outflow / Withdrawals</div>
+                        <div class="stat-value">₹<span th:text="${#numbers.formatDecimal(stats.totalWithdrawals, 1, 'COMMA', 2, 'POINT')}">0.00</span></div>
+                    </div>
+                </div>
+
+                <div class="stat-card emerald">
+                    <div class="stat-icon">⚖️</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Deposit-to-Withdrawal Ratio</div>
+                        <div class="stat-value" th:text="${stats.totalWithdrawals > 0 ? #numbers.formatDecimal(stats.totalDeposits / stats.totalWithdrawals, 1, 2) + 'x' : '100%'}">1.0x</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- College Requirement 7: Bresenham Line Drawing Algorithm Implementation -->
+            <div class="card" style="margin-bottom: 28px; border-left: 6px solid var(--color-primary);">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">📐 Computer Graphics Algorithm: Bresenham Line Drawing Algorithm</div>
+                        <div class="card-subtitle">Pixel-accurate line rasterization on HTML5 Canvas using pure integer arithmetic and error terms.</div>
+                    </div>
+                    <span class="badge" style="background-color: var(--color-primary-subtle); color: var(--color-primary); font-size: 12px; padding: 4px 10px;">
+                        College Viva Assignment Module
+                    </span>
+                </div>
+
+                <!-- Explanation Box for College Viva -->
+                <div style="background-color: var(--bg-subtle); border-radius: var(--radius-sm); padding: 18px; margin-bottom: 20px; font-size: 13px; line-height: 1.6;">
+                    <strong style="color: var(--color-primary); font-size: 14px;">📘 Viva Explanation & Working Principle:</strong><br>
+                    • <strong>Why Bresenham?</strong> Standard line formulas use floating-point division (<code>y = m*x + c</code>), which is computationally expensive on raster hardware. Bresenham replaces floating point math with <em>pure integer additions and bit-shifts</em>.<br>
+                    • <strong>Decision Parameter (D):</strong> At step <code>(x, y)</code>, the next pixel can either be East <code>(x+1, y)</code> or North-East <code>(x+1, y+1)</code>. The algorithm computes <code>D = 2*dy - dx</code>. If <code>D &le; 0</code>, select East and increment <code>D += 2*dy</code>. If <code>D &gt; 0</code>, select North-East and increment <code>D += 2*(dy - dx)</code>.<br>
+                    • <strong>Code Location:</strong> Located in separate, well-commented file at <code style="background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color);">src/main/resources/static/js/bresenham.js</code>.
+                </div>
+
+                <!-- Canvas Component -->
+                <div class="canvas-wrapper">
+                    <canvas id="analyticsBresenhamCanvas" class="bresenham-canvas" width="940" height="320"></canvas>
+                </div>
+            </div>
+
+            <!-- Side-by-Side Standard Comparison Charts -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px;">
+                <!-- Bar Chart: Inflow vs Outflow -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">📊 Deposits vs. Withdrawals</div>
+                            <div class="card-subtitle">Aggregated database transaction comparison</div>
+                        </div>
+                    </div>
+                    <div style="height: 280px; position: relative;">
+                        <canvas id="barComparisonChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Pie Chart: Cash Flow Distribution -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">🥧 Bank Asset Ratio</div>
+                            <div class="card-subtitle">Proportion of liquid deposits vs. total withdrawn capital</div>
+                        </div>
+                    </div>
+                    <div style="height: 280px; position: relative;">
+                        <canvas id="pieDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script th:src="@{/js/bresenham.js}"></script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", () => {
+        // 1. Render Bresenham Algorithm Line Chart
+        const bresenhamCanvas = document.getElementById('analyticsBresenhamCanvas');
+        if (bresenhamCanvas) {
+            /*[# th:if="${!#lists.isEmpty(accounts)}"]*/
+            const dataPoints = [
+                /*[# th:each="acc : ${accounts}"]*/
+                {
+                    label: /*[[${acc.holderName}]]*/ 'Account',
+                    value: /*[[${acc.balance}]]*/ 0
+                },
+                /*[/]*/
+            ];
+            /*[/]*/
+
+            /*[# th:if="${#lists.isEmpty(accounts)}"]*/
+            const dataPoints = [
+                { label: 'Sample A', value: 35000 },
+                { label: 'Sample B', value: 50000 },
+                { label: 'Sample C', value: 42000 }
+            ];
+            /*[/]*/
+
+            const renderer = new BresenhamCanvasRenderer(bresenhamCanvas);
+            renderer.renderLineChart(dataPoints, {
+                title: 'Account Holdings Curve (Bresenham Pure Integer Algorithm)',
+                lineColor: '#0f766e',
+                pointColor: '#d97706',
+                padding: 55
+            });
+        }
+
+        // 2. Render Standard Chart.js Bar Chart
+        const totalDeposits = /*[[${stats.totalDeposits}]]*/ 0;
+        const totalWithdrawals = /*[[${stats.totalWithdrawals}]]*/ 0;
+        const totalPool = /*[[${stats.totalBankBalance}]]*/ 0;
+
+        const barCtx = document.getElementById('barComparisonChart');
+        if (barCtx) {
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Total Deposits', 'Total Withdrawals'],
+                    datasets: [{
+                        label: 'Amount in ₹',
+                        data: [totalDeposits, totalWithdrawals],
+                        backgroundColor: ['#059669', '#d97706'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: (val) => '₹' + val.toLocaleString('en-IN')
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3. Render Distribution Doughnut Chart
+        const pieCtx = document.getElementById('pieDistributionChart');
+        if (pieCtx) {
+            new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Current Bank Reserves', 'Total Disbursed Withdrawals'],
+                    datasets: [{
+                        data: [totalPool, totalWithdrawals],
+                        backgroundColor: ['#0f766e', '#f59e0b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>
